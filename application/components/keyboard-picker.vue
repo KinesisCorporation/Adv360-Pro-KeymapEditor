@@ -34,6 +34,7 @@ import * as config from '../config'
 import { loadLayout } from '../layout.js'
 import { loadKeymap } from '../keymap.js'
 import { loadMacro } from '../macro.js'
+import keyBy from 'lodash/keyBy'
 
 import GithubPicker from './github/picker.vue'
 import Selector from './selector.vue'
@@ -43,6 +44,14 @@ export default {
   name: 'KeyboardPicker',
   components: { GithubPicker, Selector },
   emits: ['select'],
+  inject: [
+    'keycodes',
+    'behaviours',
+    'customKeycodes',
+    'customBehaviours',
+    'indexedKeycodes',
+    'indexedBehaviours'
+  ],
   data() {
     const sourceChoices = compact([
       config.enableLocal ? { id: 'local', name: 'Local' } : null,
@@ -95,6 +104,12 @@ export default {
       Object.assign(keymap, {
         layer_names: layerNames
       })
+
+      //Reload custom keycodes and behaviors and re-assign indexed values
+      this.customKeycodes.splice(0, this.customKeycodes.length, ...custKeycodes)
+      this.customBehaviours.splice(0, this.customBehaviours.length, ...custBehaviors) 
+      Object.assign(this.indexedKeycodes, keyBy(this.keycodes.concat(this.customKeycodes), 'code'))
+      Object.assign(this.indexedBehaviours, keyBy(this.behaviours.concat(this.customBehaviours), 'code'))
 
       this.$emit('select', { source, layout, keymap, macro, custKeycodes, custBehaviors, ...rest })
     },
