@@ -18,12 +18,33 @@ const EMPTY_KEYMAP = {
 const EMPTY_MACRO = {
 }
 
+const EMPTY_CUSTOM = []
+
+
 function loadBehaviors() {
   return JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'zmk-behaviors.json')))
 }
 
+function loadCustomBehaviors() {
+  const filePath = path.join(ZMK_PATH, 'config', 'cust_behaviors.json')
+  const content = fs.existsSync(filePath)
+    ? JSON.parse(fs.readFileSync(filePath))
+    : EMPTY_CUSTOM
+    
+  return content;
+}
+
 function loadKeycodes() {
   return JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'zmk-keycodes.json')))
+}
+
+function loadCustomKeycodes() {
+  const filePath = path.join(ZMK_PATH, 'config', 'cust_keycodes.json')
+  const content = fs.existsSync(filePath)
+    ? JSON.parse(fs.readFileSync(filePath))
+    : EMPTY_CUSTOM
+    
+  return content;
 }
 
 function loadLayout (layout = 'LAYOUT') {
@@ -78,20 +99,37 @@ function exportMacro(macroJSON, flash, callback) {
   fs.existsSync(macroPath) || fs.mkdirSync(macroPath)
   fs.writeFileSync(path.join(macroPath, 'macros.dtsi'), macroJSON)
 
-  // Note: This isn't really helpful. In the QMK version I had this actually
-  // calling `make` and piping the output in realtime but setting up a ZMK dev
-  // environment proved to be more complex than I had patience for, so for now
-  // I'm writing changes to a zmk-config repo and counting on the predefined
-  // GitHub action to actually compile.
+  return childProcess.execFile('git', ['status'], { cwd: ZMK_PATH }, callback)
+}
+
+function exportCustKeycodes(customJson, flash, callback) {
+  const filePath = path.join(ZMK_PATH, 'config')
+
+  fs.existsSync(filePath) || fs.mkdirSync(filePath)
+  fs.writeFileSync(path.join(filePath, 'cust_keycodes.json'), customJson)
+
+  return childProcess.execFile('git', ['status'], { cwd: ZMK_PATH }, callback)
+}
+
+function exportCustBehaviors(customJson, flash, callback) {
+  const filePath = path.join(ZMK_PATH, 'config')
+
+  fs.existsSync(filePath) || fs.mkdirSync(filePath)
+  fs.writeFileSync(path.join(filePath, 'cust_behaviors.json'), customJson)
+
   return childProcess.execFile('git', ['status'], { cwd: ZMK_PATH }, callback)
 }
 
 module.exports = {
   loadBehaviors,
   loadKeycodes,
+  loadCustomBehaviors,
+  loadCustomKeycodes,
   loadLayout,
   loadKeymap,
   exportKeymap,
   loadMacro,
-  exportMacro
+  exportMacro,
+  exportCustBehaviors,
+  exportCustKeycodes
 }

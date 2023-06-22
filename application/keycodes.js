@@ -12,6 +12,14 @@ export function loadMacro () {
   return api.loadMacro()
 }
 
+export function loadCustomBehaviors () {
+  return api.loadCustomBehaviors()
+}
+
+export function loadCustomKeycodes () {
+  return api.loadCustomKeycodes().then(normalizeZmkKeycodes)
+}
+
 function shortestAlias (aliases) {
   return [...aliases]
     .sort((a, b) => a.length - b.length)[0]

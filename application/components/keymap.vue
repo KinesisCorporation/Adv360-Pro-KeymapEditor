@@ -16,7 +16,7 @@ export default {
     'layer-selector': LayerSelector,
     'keyboard-layout': KeyboardLayout
   },
-  props: ['layout', 'keymap', 'macro'],
+  props: ['layout', 'keymap', 'macro', 'custKeycodes', 'custBehaviors'],
   emits: ['update'],
   inject: [
     'keycodes',
@@ -76,7 +76,7 @@ export default {
 
       switch (param) {
         case 'behaviour':
-          return this.behaviours
+          return this.behaviours.concat(this.custBehaviors)
         case 'layer':
           return this.availableLayers
         case 'macro':
@@ -87,7 +87,7 @@ export default {
           return get(this.sources, ['behaviours', behaviour, 'commands'], [])
         case 'kc':
         default:
-          return this.keycodes
+          return this.keycodes.concat(this.custKeycodes)
       }
     },
     boundingBox() {
@@ -139,6 +139,18 @@ export default {
     },
     handleRenameLayer() {
       this.$emit('update', { ...this.keymap })
+    },
+    addCustomKey(newKey) {
+        this.custKeycodes.push(newKey)
+        //this.indexedKeycodes.push(newKey)
+        Object.assign(this.indexedKeycodes, keyBy(this.keycodes.concat(this.custKeycodes), 'code'))
+        //this.$emit('add-custom-key', newKey)
+    },
+    addCustomBehavior(newBehavior) {
+        //this.behaviours.push(newBehavior)
+        this.custBehaviors.push(newBehavior)
+        Object.assign(this.indexedBehaviours, keyBy(this.behaviours.concat(this.custBehaviors), 'code'))
+        //this.$emit('add-custom-behavior', newBehavior)
     }
   }
 }
@@ -161,6 +173,8 @@ export default {
       :layout="layout"
       :keys="keymap.layers[activeLayer]"
       @update="handleUpdateLayer(activeLayer, $event)"
+      @add-custom-key="addCustomKey"
+      @add-custom-behavior="addCustomBehavior"
       class="active"
     />
   </div>

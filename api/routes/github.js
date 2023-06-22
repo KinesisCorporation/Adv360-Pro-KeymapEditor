@@ -16,6 +16,8 @@ const { createInstallationToken } = require('../services/github/auth')
 const { MissingRepoFile, findCodeKeymap } = require('../services/github/files')
 const { parseKeymap, validateKeymapJson, KeymapValidationError } = require('../services/zmk/keymap')
 const { parseMacro, validateMacroJson, MacroValidationError } = require('../services/zmk/macro')
+const { parseCustKeycodes, validateCustKeycodesJson, CustKeycodesValidationError } = require('../services/zmk/custKeycodes')
+const { parseCustBehaviors, validateCustBehaviorsJson, CustBehaviorsValidationError } = require('../services/zmk/custBehaviors')
 const { validateInfoJson, InfoValidationError } = require('../services/zmk/layout')
 const { featchRuns } = require('../services/github/installations')
 
@@ -114,15 +116,19 @@ const getKeyboardFiles = async (req, res, next) => {
   const { branch } = req.query
 
   try {
-    const { info, keymap, macro } = await fetchKeyboardFiles(installationId, repository, branch)
+    const { info, keymap, macro, custKeycodes, custBehaviors } = await fetchKeyboardFiles(installationId, repository, branch)
     validateInfoJson(info)
     validateKeymapJson(keymap)
     validateMacroJson(macro)
+    validateCustKeycodesJson(custKeycodes)
+    validateCustBehaviorsJson(custBehaviors)
 
     res.json({
       info,
       keymap: parseKeymap(keymap),
-      macro: parseMacro(macro)
+      macro: parseMacro(macro),
+      custKeycodes: parseCustKeycodes(custKeycodes),
+      custBehaviors: parseCustBehaviors(custBehaviors)
     })
   } catch (err) {
     if (err instanceof MissingRepoFile) {
@@ -146,10 +152,10 @@ const getKeyboardFiles = async (req, res, next) => {
 
 const updateKeyboardFiles = async (req, res, next) => {
   const { installationId, repository, branch } = req.params
-  const { keymap, layout, macro } = req.body
+  const { keymap, layout, macro, custKeycodes, custBehaviors } = req.body
 
   try {
-    await commitChanges(installationId, repository, branch, layout, keymap, macro)
+    await commitChanges(installationId, repository, branch, layout, keymap, macro, custKeycodes, custBehaviors)
   } catch (err) {
     return next(err)
   }

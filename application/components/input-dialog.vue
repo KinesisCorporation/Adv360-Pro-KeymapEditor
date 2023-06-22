@@ -1,8 +1,12 @@
 <script>
 export default {
   name: 'InputDialog',
-  emits: ['accept', 'cancel'],
+  emits: ['acceptInput', 'cancelInput'],
   props: {
+    prompt: String,
+    btnText: String,
+    btnHint: String,
+    forceUpper: Boolean
   },
   data() {
     return {
@@ -23,7 +27,7 @@ export default {
   },
   methods: {
     accept() {     
-      this.$emit('accept', this.inputVal)
+      this.$emit('acceptInput', this.inputVal)
     },
     handleClickOutside(event) {
       if (!this.$el.contains(event.target)) {
@@ -31,31 +35,45 @@ export default {
       }
     },
     cancel() {
-      this.$emit('cancel')
+      this.$emit('cancelInput')
     },
     focusInput() {
       this.$refs.inputBox.focus();
+    },
+    inputText(e) {
+      if (this.forceUpper) {
+        return this.inputVal = e.target.value.toUpperCase()
+      }
+      else
+        return this.inputVal = e.target.value 
     }
+
   }
 }
 </script>
 
 <template>
   <div class="dialog">
-    <span>Enter new macro name</span>
+    <span>{{prompt}}</span>
     <div>
       <input
         ref="inputBox"
         type="text"
         v-model="this.inputVal"   
+        @input="inputText"
         :maxlength="this.macroMax"   
       />
     </div>
     <button
       @click="accept"
       :disabled="this.inputVal === ''"
-      title="Add new macro">
-      Add
+      title="{{btnHint}}">
+      {{btnText}}
+    </button>
+    &nbsp;
+    <button
+      @click="cancel">
+      Cancel
     </button>
   </div>
 </template>

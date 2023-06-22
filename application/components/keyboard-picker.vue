@@ -37,6 +37,7 @@ import { loadMacro } from '../macro.js'
 
 import GithubPicker from './github/picker.vue'
 import Selector from './selector.vue'
+import { loadCustomKeycodes, loadCustomBehaviors } from '../api'
 
 export default {
   name: 'KeyboardPicker',
@@ -76,24 +77,26 @@ export default {
   methods: {
     async fetchLocalKeyboard() {
       const { source } = this
-      const [layout, keymap, macro] = await Promise.all([
+      const [layout, keymap, macro, custKeycodes, custBehaviors] = await Promise.all([
         loadLayout(),
         loadKeymap(),
-        loadMacro()
+        loadMacro(),
+        loadCustomKeycodes(),
+        loadCustomBehaviors(),
       ])
 
-      this.handleKeyboardSelected({ source, layout, keymap, macro })
+      this.handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors })
     },
     handleKeyboardSelected(event) {
       const { source } = this
-      const { layout, keymap, macro, ...rest } = event
+      const { layout, keymap, macro, custKeycodes, custBehaviors, ...rest } = event
 
       const layerNames = keymap.layer_names || keymap.layers.map((_, i) => `Layer ${i}`)
       Object.assign(keymap, {
         layer_names: layerNames
       })
 
-      this.$emit('select', { source, layout, keymap, macro, ...rest })
+      this.$emit('select', { source, layout, keymap, macro, custKeycodes, custBehaviors, ...rest })
     },
     getImgUrl() { 
       return require('../assets/product.png')

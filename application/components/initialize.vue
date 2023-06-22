@@ -1,8 +1,8 @@
 <script>
 import keyBy from 'lodash/keyBy'
 
-import { healthcheck, loadBehaviours } from '../api'
-import { loadKeycodes } from '../keycodes'
+import { healthcheck, loadBehaviours, loadCustomBehaviors } from '../api'
+import { loadKeycodes, loadCustomKeycodes } from '../keycodes'
 
 import Loader from './loader.vue'
 
@@ -14,7 +14,9 @@ export default {
       keycodes: [],
       behaviours: [],
       indexedKeycodes: {},
-      indexedBehaviours: {}
+      indexedBehaviours: {},
+      customKeycodes: [],
+      customBehaviours: []
     }
   },
   provide() {
@@ -22,7 +24,9 @@ export default {
       keycodes: this.keycodes,
       behaviours: this.behaviours,
       indexedKeycodes: this.indexedKeycodes,
-      indexedBehaviours: this.indexedBehaviours
+      indexedBehaviours: this.indexedBehaviours,
+      customKeycodes: this.customKeycodes,
+      customBehaviours: this.customBehaviours
     }
   },
   methods: {
@@ -31,15 +35,19 @@ export default {
       await this.loadAppData()
     },
     async loadAppData () {
-      const [ keycodes, behaviours ] = await Promise.all([
+      const [ keycodes, behaviours, customKeycodes, customBehaviours ] = await Promise.all([
         loadKeycodes(),
-        loadBehaviours(),       
+        loadBehaviours(),
+        loadCustomKeycodes(),
+        loadCustomBehaviors()    
       ])
 
       this.keycodes.splice(0, this.keycodes.length, ...keycodes)
-      this.behaviours.splice(0, this.behaviours.length, ...behaviours)     
-      Object.assign(this.indexedKeycodes, keyBy(this.keycodes, 'code'))
-      Object.assign(this.indexedBehaviours, keyBy(this.behaviours, 'code'))
+      this.behaviours.splice(0, this.behaviours.length, ...behaviours)   
+      this.customKeycodes.splice(0, this.customKeycodes.length, ...customKeycodes)
+      this.customBehaviours.splice(0, this.customBehaviours.length, ...customBehaviours) 
+      Object.assign(this.indexedKeycodes, keyBy(this.keycodes.concat(this.customKeycodes), 'code'))
+      Object.assign(this.indexedBehaviours, keyBy(this.behaviours.concat(this.customBehaviours), 'code'))
     }
   }
 }

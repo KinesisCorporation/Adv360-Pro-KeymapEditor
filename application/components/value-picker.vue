@@ -1,5 +1,6 @@
 <script>
 import fuzzysort from 'fuzzysort'
+import InputDialog from './input-dialog.vue'
 
 const cycle = (array, index, step=1) => {
   const next = (index + step) % array.length
@@ -8,7 +9,10 @@ const cycle = (array, index, step=1) => {
 
 export default {
   name: 'value-picker',
-  emits: ['cancel', 'select'],
+  emits: ['cancel', 'select', 'select-custom'],
+  components: {
+    InputDialog
+  },
   props: {
     target: Object,
     choices: Array,
@@ -30,7 +34,9 @@ export default {
     return {
       query: null,
       highlighted: null,
-      showAll: false
+      showAll: false,
+      addCustom: false,
+      customKeyBehavior: ""
     }
   },
   mounted() {
@@ -48,7 +54,7 @@ export default {
       const { query, choices } = this
       const options = { key: this.searchKey, limit: 30 }
       const filtered = fuzzysort.go(query, choices, options)
-      const showAll = this.showAll || this.searchThreshold > choices.length
+      const showAll = this.showAll || (choices && this.searchThreshold > choices.length)
 
       if (!query)
         return choices
@@ -85,6 +91,13 @@ export default {
       setTimeout(() => {
         this.query = event.target.value
       })
+    },
+    handleKeyDown(event) {
+      if (event.keyCode === 8) {
+        setTimeout(() => {
+          this.query = event.target.value
+        })
+      }
     },
     handleSelectActive() {
       if (this.results.length > 0 && this.highlighted !== null) {
@@ -127,7 +140,68 @@ export default {
       if (top < scroll || bottom > scroll + height) {
         element.scrollIntoView(alignToTop)
       }
+    },
+    handleAddCustom(customVal) {
+      let found = false
+      let keyToAdd = customVal
+
+      for (let key in this.choices) {
+        if (this.choices[key].code.toUpperCase() == keyToAdd.toUpperCase()) {
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        if (confirm("Do you really want to add this custom " + this.param + ": " + keyToAdd + " ?")) {
+          let customKey = new Object()
+          customKey.code = keyToAdd
+          customKey.description = keyToAdd
+          customKey.name = keyToAdd
+          customKey.params = []
+          customKey.isModifier = false
+          customKey.isNew = true
+          customKey.type = "UD"
+          if (this.param === "behaviour")
+            customKey.params = ["code"]
+          this.$emit('select-custom', customKey)
+        }
+        else
+          return "";
+      }
+      else
+        alert(keyToAdd + " already exists")
+    },
+    addCustomClick() {
+      this.addCustom = true
+      if (this.$refs.customBox) {
+        setTimeout(() => {
+          this.$refs.customBox.focus()
+        }, 200)      
+      }
+    },
+    cancelCustom() {
+      this.addCustom = false
+      if (this.$refs.searchBox) {
+        setTimeout(() => {
+          this.$refs.searchBox.focus()
+        }, 200)   
+      }
+    },
+    customInput(e) {
+        return this.customKeyBehavior = e.target.value.toUpperCase()
+    },
+    checkIfExists() {
+      if (this.query) {
+        var search = this.query.toUpperCase()
+        var filteredList = this.choices.filter(function(obj) {
+            return (obj.code.toUpperCase() === search)
+        });
+        return filteredList.length > 0;
+      }
+      else
+        return true;
     }
+
   }
 }
 </script>
@@ -141,14 +215,21 @@ export default {
     @keydown.enter.prevent="handleSelectActive"
     @keydown.esc.prevent="cancel"
   >
-    <p>{{prompt}}</p>
-    <input  
-      ref="searchBox"
-      type="text"
-      :value="query !== null ? query : value"
-      @keypress="handleKeyPress"
-    />
-    <ul class="results">
+    <p v-show="!addCustom">{{prompt}}</p>
+    <div class="flexContainer" v-show="!addCustom">
+      <div class="formSearch">
+        <input  
+          ref="searchBox"
+          type="text"
+          class="inputSearch"
+          :value="query !== null ? query : value"
+          @keypress="handleKeyPress"
+          @keydown="handleKeyDown"
+        />
+        <button v-show="!checkIfExists()" class="buttonCustom" @click="handleAddCustom(this.query)">Apply custom {{this.param}}</button>
+      </div>  
+    </div>   
+    <ul class="results" v-show="!addCustom">
       <li
         :key="`result-${i}`"
         :class="{ highlighted: highlighted === i }"
@@ -162,8 +243,24 @@ export default {
         <span v-else v-text="result[searchKey]" />
       </li>
     </ul>
+    <!-- <div>
+      <button @click="addCustomClick" v-show="!addCustom">
+          Add Custom Behavior/Code
+      </button>
+      <div v-show="addCustom">
+        <p>Add Custom Key/Behavior</p>
+        <input  
+          ref="customBox"
+          type="text"
+          @input="customInput"
+          v-model="this.customKeyBehavior"
+        />
+        <button @click="handleAddCustom(this.customKeyBehavior)">Add</button>
+        <button @click="cancelCustom">Cancel</button>
+      </div>
+    </div> -->
     <div
-      v-if="choices.length > searchThreshold"
+      v-show="choices.length > searchThreshold && !addCustom"
       class="choices-counter"
     >
       Total choices: {{choices.length}}.
@@ -173,13 +270,33 @@ export default {
         @click.stop="showAll = true"
       />
     </div>
+    <!-- <modal v-if="addCustom">
+      <input-dialog
+        :prompt="'Enter new key/behavior'"
+        :btnText="'Add'"
+        :btnHint="'Add new key/behavior'"
+        :forceUpper="true"
+        @acceptInput="handleAddCustom"
+        @cancelInput="addCustom = false"
+      />
+    </modal> -->
   </div>
 </template>
 
 <style scoped>
 
+.formSearch {
+  display:flex;
+  flex-direction:row;
+  padding:1px;
+  width: 100%;
+  border:1px solid;
+  border-radius: 4px;
+  background-color: white;
+}
+
 .dialog {
-  width: 300px;
+  width: 450px;
 }
 .dialog p {
 	margin: 0;
@@ -187,17 +304,12 @@ export default {
 	font-weight: bold;
 }
 .dialog input {
-	display: block;
-	width: 100%;
 	height: 30px;
 	line-height: 30px;
-
-	font-size: 120%;
-	margin: 0;
-	padding: 4px;
-	border: none;
-	border-radius: 4px;
-  box-sizing: border-box;
+  flex-grow:2;
+  font-size: 120%;
+  border:none;
+  outline: none;
 }
 ul.results {
 	font-family: monospace;
@@ -229,6 +341,31 @@ ul.results {
   color: var(--selection);
   border-bottom: 1px dotted var(--selection);
   cursor: pointer;
+}
+
+.flexContainer {
+    display: flex;
+}
+
+.inputField {
+    flex: 1;
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--hover-selection);
+  color: white;
+
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 2px;
+} 
+
+button[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 </style>

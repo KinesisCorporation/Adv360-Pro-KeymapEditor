@@ -11,6 +11,8 @@
       :value="normalized[i].value"
       :params="normalized[i].params"
       @update="handleUpdateBind(i, $event)"
+      @add-custom-key="addCustomKey"
+      @add-custom-behavior="addCustomBehavior"
     />
   </div>
 </template>
@@ -20,7 +22,7 @@ import Key from './key.vue'
 
 export default {
   props: ['layout', 'keys'],
-  emits: ['update'],
+  emits: ['update', 'add-custom-key', 'add-custom-behavior'],
   components: {
     'key-thing': Key,
   },
@@ -53,6 +55,12 @@ export default {
         updatedBinding,
         ...this.normalized.slice(keyIndex + 1)
       ])
+    },
+    addCustomKey(newKey) {
+      this.$emit('add-custom-key', newKey)
+    },
+    addCustomBehavior(newBehavior) {
+      this.$emit('add-custom-behavior', newBehavior)
     }
   }
 }

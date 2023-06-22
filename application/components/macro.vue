@@ -11,6 +11,7 @@ import Modal from './modal.vue'
 import ValuePicker from './value-picker.vue'
 import InputDialog from './input-dialog.vue'
 import Key from './key.vue'
+import isEmpty from 'lodash/isEmpty'
 
 export default {
   name: 'macro',
@@ -37,14 +38,15 @@ export default {
       type: Number,
       default: 50,
       validator: value => value >= 0
-    }
+    },
+    keymap: Object,
   },
   emits: ['cancel', 'done'],
   inject: [
     'keycodes',
     'behaviours',
     'indexedKeycodes',
-    'indexedBehaviours',
+    'indexedBehaviours'
   ],
   provide() {
     return {
@@ -67,6 +69,16 @@ export default {
     }
   },
 computed: {
+  availableLayers() {
+    if (isEmpty(this.keymap)) {
+      return []
+    }
+
+    return this.keymap.layers.map((_, i) => ({
+      code: i,
+      description: this.keymap.layer_names[i] || `Layer ${i}`
+    }))
+  },
   normalized() {
     const { value, params } = this
     const sources = this.sources()
@@ -106,7 +118,11 @@ computed: {
   behaviour() {
     const bind = this.value
     const sources = this.sources()
-    return get(sources, ['behaviours', bind])
+    var value = get(sources, ['behaviours', bind])
+    //If behavior not found, replace with none
+    if (!value)
+      value = get(sources, ['behaviours', "&none"])
+    return value
   },
   behaviourParams() {
     return getBehaviourParams(this.params, this.behaviour)
@@ -401,6 +417,7 @@ computed: {
                     :value="item.value"
                     :params="item.params"
                     :showDel="true"
+                    :fromMacro="true"
                     @update="handleUpdateBind(i, $event)"
                     @delete="deleteKey(i)"
                   />
@@ -411,8 +428,11 @@ computed: {
     </div>
     <modal v-if="addMacro">
       <input-dialog
-        @accept="handleAddMacro"
-        @cancel="addMacro = false"
+        :prompt="'Enter new macro name'"
+        :btnText="'Add'"
+        :btnHint="'Add new macro'"
+        @acceptInput="handleAddMacro"
+        @cancelInput="addMacro = false"
       />
     </modal>
   </div>

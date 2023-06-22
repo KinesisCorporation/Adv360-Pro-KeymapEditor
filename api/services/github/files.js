@@ -19,7 +19,9 @@ async function fetchKeyboardFiles (installationId, repository, branch) {
   const keymap = await fetchKeymap(installationToken, repository, branch)
   const macro = await fetchMacro(installationToken, repository, branch)
   const originalCodeKeymap = await findCodeKeymap(installationToken, repository, branch)
-  return { info, keymap, macro, originalCodeKeymap }
+  const { data: custKeycodes } = await fetchCustom(installationToken, repository, branch, 'config/cust_keycodes.json')
+  const { data: custBehaviors }  = await fetchCustom(installationToken, repository, branch, 'config/cust_behaviors.json')
+  return { info, keymap, macro, originalCodeKeymap, custKeycodes, custBehaviors }
 }
 
 async function fetchKeymap (installationToken, repository, branch) {
@@ -54,6 +56,20 @@ async function fetchMacro (installationToken, repository, branch) {
     }
   }
 }
+
+async function fetchCustom (installationToken, repository, branch, fileName) {
+  try {
+    return await fetchFile(installationToken, repository, fileName, { raw: true, branch })
+  } catch (err) {
+    if (err instanceof MissingRepoFile) {
+      return {
+      }
+    } else {
+      throw err
+    }
+  }
+}
+
 
 async function fetchFile (installationToken, repository, path, options = {}) {
   const { raw = false, branch = null } = options
@@ -105,12 +121,14 @@ async function findCodeKeymapTemplate (installationToken, repository, branch) {
   }
 }
 
-async function commitChanges (installationId, repository, branch, layout, keymap, macro) {
+async function commitChanges (installationId, repository, branch, layout, keymap, macro, custKeycodes, custBehaviors) {
   const { data: { token: installationToken } } = await auth.createInstallationToken(installationId)
   const template = await findCodeKeymapTemplate(installationToken, repository, branch)
 
   const generatedKeymap = zmk.generateKeymap(layout, keymap, template)
   const generatedMacro = zmk.generateMacro(macro)
+  const generatedCustKeycodes = zmk.generateCustKeycodes(custKeycodes)
+  const generatedCustBehaviors = zmk.generateCustBehaviors(custBehaviors)
 
   const originalCodeKeymap = await findCodeKeymap(installationToken, repository, branch)
   const { data: {sha, commit} } = await api.request({ url: `/repos/${repository}/commits/${branch}`, token: installationToken })
@@ -139,6 +157,18 @@ async function commitChanges (installationId, repository, branch, layout, keymap
           mode: MODE_FILE,
           type: 'blob',
           content: generatedMacro
+        },
+        {
+          path: 'config/cust_keycodes.json',
+          mode: MODE_FILE,
+          type: 'blob',
+          content: generatedCustKeycodes
+        },
+        {
+          path: 'config/cust_behaviors.json',
+          mode: MODE_FILE,
+          type: 'blob',
+          content: generatedCustBehaviors
         }
       ]
     }

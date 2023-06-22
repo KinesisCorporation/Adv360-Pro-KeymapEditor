@@ -175,10 +175,11 @@ function validateKeymapJson(keymap) {
           if (typeof key !== 'string') {
             errors.push(`Value at "${keyPath}" must be a string`)
           } else {
-            const bind = key.replace("&macro_", "&macro ").match(/^&.+?\b/)
-            if (!(bind && bind[0] in behavioursByBind)) {
-              errors.push(`Key bind at "${keyPath}" has invalid behaviour`)
-            }
+            // Custom behaviors break here...evaluate
+            // const bind = key.replace("&macro_", "&macro ").match(/^&.+?\b/)
+            // if (!(bind && bind[0] in behavioursByBind)) {
+            //   errors.push(`Key bind at "${keyPath}" has invalid behaviour`)
+            // }
           }
 
           // TODO: validate remaining bind parameters

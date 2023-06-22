@@ -8,24 +8,43 @@ const {
 } = require('./macro')
 
 const {
+  generateCustKeycodes
+} = require('./custKeycodes')
+
+const {
+  generateCustBehaviors
+} = require('./custBehaviors')
+
+
+const {
   loadBehaviors,
   loadKeycodes,
+  loadCustomBehaviors,
+  loadCustomKeycodes,
   loadLayout,
   loadKeymap,
   loadMacro,
   exportKeymap,
-  exportMacro
+  exportMacro,
+  exportCustKeycodes,
+  exportCustBehaviors
 } = require('./local-source')
 
 module.exports = {
   parseKeyBinding,
   generateKeymap,
   generateMacro,
+  generateCustKeycodes,
+  generateCustBehaviors,
   loadBehaviors,
   loadKeycodes,
+  loadCustomBehaviors,
+  loadCustomKeycodes,
   loadLayout,
   loadKeymap,
   loadMacro,
   exportKeymap,
-  exportMacro
+  exportMacro,
+  exportCustKeycodes,
+  exportCustBehaviors
 }

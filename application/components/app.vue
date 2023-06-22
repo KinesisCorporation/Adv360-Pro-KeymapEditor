@@ -35,16 +35,20 @@ export default {
       terminalOpen: false,
       socket: null,
       macroEdit: null,
-      macroUpdated: false
+      macroUpdated: false,
+      custBehaviors: [],
+      custKeycodes: [],
     }
   },
   methods: {
-    handleKeyboardSelected({ source, layout, keymap, macro, ...other }) {
+    handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors, ...other }) {
       this.source = source
       this.sourceOther = other
       this.layout.splice(0, this.layout.length, ...layout)
       Object.assign(this.keymap, keymap)
       Object.assign(this.macro, macro)
+      Object.assign(this.custKeycodes, custKeycodes)
+      Object.assign(this.custBehaviors, custBehaviors)
       this.editingKeymap = {}
     },
     handleUpdateKeymap(keymap) {
@@ -60,7 +64,7 @@ export default {
       this.fixMacros()
 
       this.saving = true
-      await github.commitChanges(repository, branch, this.layout, this.editingKeymap, this.macro)
+      await github.commitChanges(repository, branch, this.layout, this.editingKeymap, this.macro, this.custKeycodes, this.custBehaviors)
       this.saving = false
       Object.assign(this.keymap, this.editingKeymap)
       this.editingKeymap = {}
@@ -87,6 +91,22 @@ export default {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(this.macro)
+      })
+
+      fetch('/custkeycodes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.custKeycodes)
+      })
+
+      fetch('/custbehaviors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.custBehaviors)
       })
 
       Object.assign(this.keymap, this.editingKeymap)
@@ -151,8 +171,13 @@ export default {
     },
     getLogo() {
       return require('../assets/logo.png')
+    },
+    addCustomKey(newKey) {
+      this.custKeycodes.push(newKey)
+    },
+    addCustomBehavior(newBehavior) {
+      this.custBehaviors.push(newBehavior)
     }
-
   }
 }
 </script>
@@ -166,6 +191,10 @@ export default {
         :layout="layout"
         :keymap="editingKeymap.keyboard ? editingKeymap : keymap"
         :macro="macro"
+        :custKeycodes="custKeycodes"
+        :custBehaviors="custBehaviors"
+        @add-custom-key="addCustomKey"
+        @add-custom-behavior="addCustomBehavior"
         @update="handleUpdateKeymap"
       />
       <div v-if="macroEdit">
@@ -174,6 +203,7 @@ export default {
               :param="macroEdit.param"
               :choices="macroEdit.targets"
               :prompt="createPromptMessage(macroEdit.param)"
+              :keymap="editingKeymap.keyboard ? editingKeymap : keymap"
               searchKey="label"
               @macroupdate="handleMacroUpdate"
               @done="handleAcceptMacro"

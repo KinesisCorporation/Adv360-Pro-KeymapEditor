@@ -7,7 +7,7 @@
     :data-h="size.h"
     :data-simple="isSimple"
     :data-long="isComplex"
-    :style="[positioningStyle, keyBackColor]"
+    :style="positioningStyle"
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave"
   >
@@ -34,6 +34,7 @@
         :prompt="createPromptMessage(editing.param)"
         searchKey="code"
         @select="handleSelectValue"
+        @select-custom="handleSelectCustomValue"
         @cancel="editing = null"
       />
     </modal>
@@ -73,9 +74,10 @@ export default {
     'label',
     'value',
     'params',
-    'showDel'
+    'showDel',
+    'fromMacro'
   ],
-  emits: ['update', 'delete'],
+  emits: ['update', 'delete', 'add-custom-key', 'add-custom-behavior'],
   components: {
     'key-value': KeyValue,
     'key-paramlist': KeyParamlist,
@@ -131,7 +133,11 @@ export default {
     behaviour() {
       const bind = this.value
       const sources = this.getSources()
-      return get(sources, ['behaviours', bind])
+      var value = get(sources, ['behaviours', bind])
+      //If behavior not found, replace with none
+      if (!value)
+        value = get(sources, ['behaviours', "&none"])
+      return value
     },
     behaviourParams() {
       return getBehaviourParams(this.params, this.behaviour)
@@ -139,27 +145,34 @@ export default {
     uClass() { return `key-${this.size.u}u` },
     hClass() { return `key-${this.size.h}h` },
     outlineClass() {
-      if (this.behaviour.code === "&kp" || this.behaviour.code === "&none")
-        return 'outlineKP'
-      if (this.behaviour.code === "&mo" || this.behaviour.code === "&lt" || this.behaviour.code === "&to" || this.behaviour.code === "&tog")
-        return 'outlineLayer';
-      else if (this.behaviour.code === "&macro")
-        return 'outlineMacro';
-      else
-        return 'outlineOther';
+      if (this.behaviour) {
+        if (this.behaviour.code === "&kp" || this.behaviour.code === "&none")
+          return 'outlineKP'
+        if (this.behaviour.code === "&mo" || this.behaviour.code === "&lt" || this.behaviour.code === "&to" || this.behaviour.code === "&tog")
+          return 'outlineLayer'
+        else if (this.behaviour.code === "&macro")
+          return 'outlineMacro'
+        else if (this.behaviour.type === "UD")
+        return 'outlineUserDefined'
+        else
+          return 'outlineOther'
+      }
     },
     backKeyClass() {
       const [first] = this.normalized.params;
       const type = get(first, 'source.type', '')
-      if (first && this.behaviour.code === "&kp") {
-        if (type == 'EDIT') {
+      if (first && (this.behaviour.code === "&kp" || this.behaviour.type === "UD")) {
+        if (type === 'EDIT') {
           return 'typeEdit'
         }
-        else if (type == 'MEDIA') {
+        else if (type === 'MEDIA') {
           return 'typeMedia'
         }
-        else if (type == 'MOD') {
+        else if (type === 'MOD') {
           return 'typeMod'
+        }
+        else if (type === 'UD') {
+          return 'typeUserDefined'
         }
         else if (type === 'KB' || type === 'KP')
         {
@@ -239,6 +252,12 @@ export default {
       }
     },
     handleSelectValue(source) {
+      if (this.fromMacro && source.code == "&macro")
+      {
+        alert('You cannot select a macro behavior here')
+        return
+      }
+
       const { normalized } = this
       const { codeIndex } = this.editing
       const updated = cloneDeep(normalized)
@@ -253,6 +272,13 @@ export default {
 
       this.editing = null
       this.$emit('update', pick(updated, ['value', 'params']))
+    },
+    handleSelectCustomValue(source) {
+      if (this.editing.param === "behaviour")
+        this.$emit('add-custom-behavior', source)
+      else
+        this.$emit('add-custom-key', source)
+      this.handleSelectValue(source) 
     },
     handleDelete() {
       this.editing = null
@@ -345,8 +371,16 @@ export default {
   border: purple solid 2px;
 }
 
+.outlineUserDefined {
+  border: red solid 2px;
+}
+
 .typeMod {
   background-color: #DAF7A6;
+}
+
+.typeUserDefined {
+  background-color: rgb(145, 88, 88);
 }
 
 .typeMedia {

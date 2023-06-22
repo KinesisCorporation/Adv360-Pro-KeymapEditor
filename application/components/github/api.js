@@ -118,7 +118,9 @@ export class API extends EventEmitter {
       return {
         layout: defaultLayout.layout,
         keymap: data.keymap,
-        macro: data.macro
+        macro: data.macro,
+        custKeycodes: data.custKeycodes,
+        custBehaviors: data.custBehaviors
       }
     } catch (err) {
       if (err.response?.status === 400) {
@@ -139,7 +141,7 @@ export class API extends EventEmitter {
     return data
   }
 
-  commitChanges(repo, branch, layout, keymap, macro) {
+  commitChanges(repo, branch, layout, keymap, macro, custKeycodes, custBehaviors) {
     const installation = encodeURIComponent(this.repoInstallationMap[repo])
     const repository = encodeURIComponent(repo)
 
@@ -147,7 +149,7 @@ export class API extends EventEmitter {
       url: `/github/keyboard-files/${installation}/${repository}/${encodeURIComponent(branch)}`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      data: { layout, keymap, macro }
+      data: { layout, keymap, macro, custKeycodes, custBehaviors }
     })
   }
 }
