@@ -58,7 +58,7 @@
   {
     "code": "&mt",
     "name": "Mod Tap",
-    "params": ["mod", "code"]
+    "params": ["code", "code"]
   },
   {
     "code": "&out",

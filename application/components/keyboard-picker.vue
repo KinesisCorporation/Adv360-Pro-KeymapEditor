@@ -35,10 +35,11 @@ import { loadLayout } from '../layout.js'
 import { loadKeymap } from '../keymap.js'
 import { loadMacro } from '../macro.js'
 import keyBy from 'lodash/keyBy'
+import { loadCustomKeycodes } from '../keycodes.js'
 
 import GithubPicker from './github/picker.vue'
 import Selector from './selector.vue'
-import { loadCustomKeycodes, loadCustomBehaviors } from '../api'
+import { loadCustomBehaviors } from '../api'
 
 export default {
   name: 'KeyboardPicker',
