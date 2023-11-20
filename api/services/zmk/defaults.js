@@ -18,6 +18,7 @@ const keymapTemplate = `
 / {
   behaviors {
     #include "macros.dtsi"
+    #include "version.dtsi"
 
     hm: homerow_mods {
         compatible = "zmk,behavior-hold-tap";
