@@ -27,7 +27,8 @@ const {
   exportKeymap,
   exportMacro,
   exportCustKeycodes,
-  exportCustBehaviors
+  exportCustBehaviors,
+  exportVersion
 } = require('./local-source')
 
 module.exports = {
@@ -46,5 +47,6 @@ module.exports = {
   exportKeymap,
   exportMacro,
   exportCustKeycodes,
-  exportCustBehaviors
+  exportCustBehaviors,
+  exportVersion
 }

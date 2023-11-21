@@ -120,6 +120,15 @@ function exportCustBehaviors(customJson, flash, callback) {
   return childProcess.execFile('git', ['status'], { cwd: ZMK_PATH }, callback)
 }
 
+function exportVersion(versionJSON, flash, callback) {
+  const versionPath = path.join(ZMK_PATH, 'config')
+
+  fs.existsSync(versionPath) || fs.mkdirSync(versionPath)
+  fs.writeFileSync(path.join(versionPath, 'version.dtsi'), versionJSON)
+
+  return childProcess.execFile('git', ['status'], { cwd: ZMK_PATH }, callback)
+}
+
 module.exports = {
   loadBehaviors,
   loadKeycodes,
@@ -131,5 +140,6 @@ module.exports = {
   loadMacro,
   exportMacro,
   exportCustBehaviors,
-  exportCustKeycodes
+  exportCustKeycodes,
+  exportVersion
 }

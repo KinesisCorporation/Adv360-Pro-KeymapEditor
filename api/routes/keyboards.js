@@ -72,4 +72,16 @@ router.post('/custbehaviors', (req, res) => {
   })
 })
 
+router.post('/version', (req, res) => {
+  const version = ''
+  const exportStdout = zmk.exportVersion(version, 'flash' in req.query, err => {
+    if (err) {
+      res.status(500).send(err)
+      return
+    }
+
+    res.send()
+  })
+})
+
 module.exports = router

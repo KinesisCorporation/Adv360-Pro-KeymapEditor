@@ -109,6 +109,14 @@ export default {
         body: JSON.stringify(this.custBehaviors)
       })
 
+      fetch('/version', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: ''
+      })
+
       Object.assign(this.keymap, this.editingKeymap)
       this.editingKeymap = {}
       this.macroUpdated = false

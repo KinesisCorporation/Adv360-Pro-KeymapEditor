@@ -127,6 +127,7 @@ async function commitChanges (installationId, repository, branch, layout, keymap
 
   const generatedKeymap = zmk.generateKeymap(layout, keymap, template)
   const generatedMacro = zmk.generateMacro(macro)
+  const generatedVersion = ''
   const generatedCustKeycodes = zmk.generateCustKeycodes(custKeycodes)
   const generatedCustBehaviors = zmk.generateCustBehaviors(custBehaviors)
 
@@ -157,6 +158,12 @@ async function commitChanges (installationId, repository, branch, layout, keymap
           mode: MODE_FILE,
           type: 'blob',
           content: generatedMacro
+        },
+        {
+          path: 'config/version.dtsi',
+          mode: MODE_FILE,
+          type: 'blob',
+          content: generatedVersion
         },
         {
           path: 'config/cust_keycodes.json',
