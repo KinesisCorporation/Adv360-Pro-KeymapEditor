@@ -431,6 +431,7 @@ computed: {
         :prompt="'Enter new macro name'"
         :btnText="'Add'"
         :btnHint="'Add new macro'"
+        :preventKeys="'\''"
         @acceptInput="handleAddMacro"
         @cancelInput="addMacro = false"
       />

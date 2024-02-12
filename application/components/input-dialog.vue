@@ -6,6 +6,7 @@ export default {
     prompt: String,
     btnText: String,
     btnHint: String,
+    preventKeys: String,
     forceUpper: Boolean
   },
   data() {
@@ -46,6 +47,13 @@ export default {
       }
       else
         return this.inputVal = e.target.value 
+    },
+    handleKeyPress(event) {
+      if ((this.preventKeys ?? "").indexOf(event.key) >= 0)
+      {
+        alert("This key is not allowed in a macro name: " + event.key)
+        event.preventDefault()
+      }
     }
 
   }
@@ -61,7 +69,8 @@ export default {
         type="text"
         v-model="this.inputVal"   
         @input="inputText"
-        :maxlength="this.macroMax"   
+        :maxlength="this.macroMax"
+        @keypress="handleKeyPress"   
       />
     </div>
     <button
