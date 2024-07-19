@@ -28,7 +28,7 @@
     <modal v-if="editing">
       <value-picker
         :target="editing.target"
-        :value="editing.code"
+        :value="getEditingValue(editing)"
         :param="editing.param"
         :choices="editing.targets"
         :prompt="createPromptMessage(editing.param)"
@@ -85,8 +85,10 @@ export default {
     ValuePicker
   },
   data () {
+    const selectedKbLang = localStorage.getItem('selectedKbLang')
     return {
       editing: null,
+      selectedKbLang
     }
   },
   inject: ['getSearchTargets', 'getSources'],
@@ -196,7 +198,12 @@ export default {
     },
     isComplex() {
       const [first] = this.normalized.params
-      const symbol = get(first, 'source.symbol', get(first, 'value', ''))
+      if (this.selectedKbLang && this.selectedKbLang != "en") {
+        var altLang =  get(first, 'source.altLangs', null)
+        if (altLang)
+          altLang = altLang[this.selectedKbLang];
+      }
+      const symbol = altLang || get(first, 'source.symbol', get(first, 'value', ''))
       const isLongSymbol = symbol.length > 4
       const isMultiParam = this.behaviourParams.length > 1
       const isNestedParam = get(first, 'params', []).length > 0
@@ -220,6 +227,17 @@ export default {
 
       return promptMapping[param] || promptMapping.keycode
     },
+    getEditingValue(editing) {
+      if (this.selectedKbLang && this.selectedKbLang != "en") {
+        var altLang;
+        if (this.editing.altLangs)
+          altLang = editing.altLangs[this.selectedKbLang];
+
+        return altLang || editing.code
+      }
+      else
+        return editing.code
+    },
     onMouseOver(event) {
       const old = document.querySelector('.highlight')
       old && old.classList.remove('highlight')
@@ -237,9 +255,23 @@ export default {
       }
       else
       {
-        this.editing = pick(event, ['target', 'codeIndex', 'code', 'param'])
+        this.editing = pick(event, ['target', 'codeIndex', 'code', 'altLangs', 'param'])
         this.editing.isMacro = false;
         this.editing.targets = this.getSearchTargets(this.editing.param, this.value)
+        
+        //Filter search results by language (English + selected keyboard)
+        var language = this.selectedKbLang;
+        if (language && language != "en") {
+          this.editing.targets = this.editing.targets.filter(function(obj) {
+            return (obj.langCode === "en") || (obj.langCode === language)
+          });
+        }
+        else
+        {
+          this.editing.targets = this.editing.targets.filter(function(obj) {
+            return (obj.langCode === "en")
+          });
+        }
       }
     },
     handleSelectBehaviour(event) {

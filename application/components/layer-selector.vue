@@ -28,8 +28,15 @@ export default {
       this.$emit('new-layer')
     },
     handleDelete(layerIndex, layerName) {
-      const confirmation = confirm(`really delete layer: ${layerName}?`);
-      confirmation && this.$emit("delete-layer", layerIndex);
+      if (layerName && layerName.toUpperCase() == "MOD")
+      {
+        alert('Cannot delete ' + layerName + ' layer.')
+      }
+      else
+      {
+        const confirmation = confirm(`really delete layer: ${layerName}?`);
+        confirmation && this.$emit("delete-layer", layerIndex);
+      }
     },
     handleClickOutside({ target }) {
       const input = this.$el.querySelector('.active input.name')
@@ -55,7 +62,7 @@ export default {
       >
         <span class="index">{{i}}</span>
         <input
-          v-if="activeLayer == i && renaming"
+          v-if="activeLayer == i && renaming && name.toUpperCase() !== 'MOD'"
           v-model="layers[i]"
           :ref="input => input && input.focus()"
           class="name"

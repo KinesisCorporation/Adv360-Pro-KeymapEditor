@@ -26,6 +26,7 @@ export default {
     return {
       config,
       source: null,
+      kbLang: null,
       sourceOther: null,
       layout: [],
       keymap: {},
@@ -41,8 +42,9 @@ export default {
     }
   },
   methods: {
-    handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors, ...other }) {
+    handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors, kbLang, ...other }) {
       this.source = source
+      this.kbLang = kbLang
       this.sourceOther = other
       this.layout.splice(0, this.layout.length, ...layout)
       Object.assign(this.keymap, keymap)

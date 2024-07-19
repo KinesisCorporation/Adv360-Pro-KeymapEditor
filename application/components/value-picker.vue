@@ -33,6 +33,7 @@ export default {
   data() {
     return {
       query: null,
+      filtered: null,
       highlighted: null,
       showAll: false,
       addCustom: false,
@@ -52,14 +53,14 @@ export default {
   computed: {
     results() {
       const { query, choices } = this
-      const options = { key: this.searchKey, limit: 30 }
-      const filtered = fuzzysort.go(query, choices, options)
+      const options = { keys: [this.searchKey, "altLang"], limit: 30 }
+      this.filtered = fuzzysort.go(query, choices, options)
       const showAll = this.showAll || (choices && this.searchThreshold > choices.length)
 
       if (!query)
         return choices
 
-      return filtered.map(result => ({
+      return this.filtered.map(result => ({
         ...result.obj,
         search: result
       }))
@@ -82,7 +83,9 @@ export default {
   },
   methods: {
     highlight(result) {
-      return fuzzysort.highlight(result)
+      // this.filtered[0][0].highlight()
+      // this.filtered[0][1].highlight()
+      // return this.filtered[0][1].target || this.filtered[0][0].target
     },
     handleClickResult(result) {
       this.$emit('select', result)
@@ -150,6 +153,10 @@ export default {
           found = true
           break
         }
+        if (this.choices[key].altLang.toUpperCase() == keyToAdd.toUpperCase()) {
+          found = true
+          break
+        }
       }
       if (!found) {
         if (confirm("Do you really want to add this custom " + this.param + ": " + keyToAdd + " ?")) {
@@ -194,7 +201,7 @@ export default {
       if (this.query) {
         var search = this.query.toUpperCase()
         var filteredList = this.choices.filter(function(obj) {
-            return (obj.code.toUpperCase() === search)
+            return (obj.code.toUpperCase() === search) || (obj.altLang && obj.altLang.toUpperCase() === search)
         });
         return filteredList.length > 0;
       }
@@ -239,8 +246,9 @@ export default {
         @click="handleClickResult(result)"
         @mouseover="setHighlight(i)"
       >
-        <span v-if="result.search" v-html="highlight(result.search)" />
-        <span v-else v-text="result[searchKey]" />
+      <span> {{result.altLang || result[searchKey] }} </span>
+        <!-- <span v-if="result.search" v-html="highlight(result)" />
+        <span v-else> {{result.altLang || result[searchKey] }} </span> -->
       </li>
     </ul>
     <!-- <div>

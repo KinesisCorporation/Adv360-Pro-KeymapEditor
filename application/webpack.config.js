@@ -45,8 +45,8 @@ module.exports = {
       ENABLE_LOCAL: false,
       ENABLE_GITHUB: true,
       GITHUB_APP_NAME: 'Adv360ProApp',
-      //API_BASE_URL: 'http://localhost:8080', // local url
-      //APP_BASE_URL: 'http://localhost:8080' // local url
+      // API_BASE_URL: 'http://localhost:8080', // local url
+      // APP_BASE_URL: 'http://localhost:8080' // local url
       API_BASE_URL: 'https://adv360-pro-api.herokuapp.com', // prod. values
       APP_BASE_URL: 'https://kinesiscorporation.github.io/Adv360-Pro-GUI' // prod. values
     }),

@@ -2,11 +2,11 @@
   <span
     class="code"
     :title="source && `(${source.code}) ${source.description}`"
-    @click.stop="onSelect({ target: $event.target, codeIndex: index, code: value, param })"
+    @click.stop="onSelect({ target: $event.target, codeIndex: index, code: value, altLangs: source.altLangs, param })"
   >
     <template v-if="source">
       <span v-if="source.faIcon" class="['fa', `fa-${source.faIcon}" />
-      <template v-else>{{source.symbol || source.code}}</template>
+      <template v-else>{{getCodeValue()}}</template>
     </template>
     <template v-else>⦸</template>
   </span>
@@ -15,7 +15,26 @@
 <script>
 export default {
   name: 'key-value',
-  props: ['param', 'index', 'value', 'source', 'onSelect']
+  props: ['param', 'index', 'value', 'source', 'onSelect'],
+  data() {
+    const selectedKbLang = localStorage.getItem('selectedKbLang')
+    return {
+      selectedKbLang
+    }
+  },
+  methods: {
+    getCodeValue() {
+      if (this.selectedKbLang && this.selectedKbLang != "en") {
+        var altLang;
+        if (this.source.altLangs)
+          altLang = this.source.altLangs[this.selectedKbLang];
+
+        return altLang || this.source.symbol || this.source.code
+      }
+      else
+        return this.source.symbol || this.source.code
+    }
+  }
 }
 </script>
 

@@ -7,6 +7,12 @@
       :id="source"
       :choices="sourceChoices"
     />
+    <selector
+      v-model="kbLang"
+      label="Language"
+      :id="kbLang"
+      :choices="kbLangChoices"
+    />
 
     <github-picker
       v-if="source == 'github'"
@@ -59,16 +65,26 @@ export default {
       config.enableGitHub ? { id: 'github', name: 'GitHub' } : null
     ])
 
+    const kbLangChoices = compact([
+      { id: 'en', name: 'English' },
+      { id: 'jp', name: 'Japanese' }
+    ])
+
     const selectedSource = localStorage.getItem('selectedSource')
+    const selectedKbLang = localStorage.getItem('selectedKbLang')
     const onlySource = sourceChoices.length === 1 ? sourceChoices[0].id : null
 
     return {
       sourceChoices,
+      kbLangChoices,
       source: onlySource || (
         sourceChoices.find(source => source.id === selectedSource)
           ? selectedSource.id
           : null
-      )
+      ),
+      kbLang: kbLangChoices.find(lang => lang.id === selectedKbLang)
+          ? selectedKbLang
+          : kbLangChoices[0].id
     }
   },
   mounted() {
@@ -82,11 +98,15 @@ export default {
       if (value === 'local') {
         this.fetchLocalKeyboard()
       }
+    },
+    kbLang(value) {
+      localStorage.setItem('selectedKbLang', value)
+      location.reload()
     }
   },
   methods: {
     async fetchLocalKeyboard() {
-      const { source } = this
+      const { source, kbLang } = this
       const [layout, keymap, macro, custKeycodes, custBehaviors] = await Promise.all([
         loadLayout(),
         loadKeymap(),
@@ -95,10 +115,10 @@ export default {
         loadCustomBehaviors(),
       ])
 
-      this.handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors })
+      this.handleKeyboardSelected({ source, layout, keymap, macro, custKeycodes, custBehaviors, kbLang })
     },
     handleKeyboardSelected(event) {
-      const { source } = this
+      const { source, kbLang } = this
       const { layout, keymap, macro, custKeycodes, custBehaviors, ...rest } = event
 
       const layerNames = keymap.layer_names || keymap.layers.map((_, i) => `Layer ${i}`)
@@ -112,7 +132,7 @@ export default {
       Object.assign(this.indexedKeycodes, keyBy(this.keycodes.concat(this.customKeycodes), 'code'))
       Object.assign(this.indexedBehaviours, keyBy(this.behaviours.concat(this.customBehaviours), 'code'))
 
-      this.$emit('select', { source, layout, keymap, macro, custKeycodes, custBehaviors, ...rest })
+      this.$emit('select', { source, layout, keymap, macro, custKeycodes, custBehaviors, kbLang, ...rest })
     },
     getImgUrl() { 
       return require('../assets/product.png')

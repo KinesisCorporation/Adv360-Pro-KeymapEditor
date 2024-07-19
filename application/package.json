@@ -18,7 +18,7 @@
     "axios": "^0.24.0",
     "eventemitter3": "^4.0.7",
     "file-loader": "^6.2.0",
-    "fuzzysort": "^1.1.4",
+    "fuzzysort": "^3",
     "lodash": "^4.17.21",
     "url-loader": "^4.1.1",
     "xterm": "^4.8.1"

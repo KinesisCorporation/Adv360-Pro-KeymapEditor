@@ -821,6 +821,7 @@
   },
   {
     "names": ["MINUS"],
+    "altLangs": {"jp": "- (マイナス)"},
     "description": "- [Minus] and _ [Underscore]",
     "context": "Keyboard",
     "clarify": false,
@@ -853,6 +854,7 @@
   },
   {
     "names": ["EQUAL"],
+    "altLangs": {"jp": "^ (カレット)"},
     "description": "= [Equal] and + [Plus]",
     "context": "Keyboard",
     "clarify": false,
@@ -885,6 +887,7 @@
   },
   {
     "names": ["LEFT_BRACKET", "LBKT"],
+    "altLangs": {"jp": "@ (アットマーク)"},
     "symbol": "[",
     "description": "[ [Left Bracket] and { [Left Brace]",
     "context": "Keyboard",
@@ -919,6 +922,7 @@
   },
   {
     "names": ["RIGHT_BRACKET", "RBKT"],
+    "altLangs": {"jp": "[ (左大括弧)"},
     "symbol": "]",
     "description": "] [Right Bracket] and } [Right Brace]",
     "context": "Keyboard",
@@ -986,6 +990,7 @@
   },
   {
     "names": ["NON_US_HASH"],
+    "altLangs": {"jp": "] (右大括弧)"},
     "description": "Non-US # [Hash/Pound] and ~ [Tilde]",
     "context": "Keyboard",
     "clarify": false,
@@ -1018,6 +1023,7 @@
   },
   {
     "names": ["SEMICOLON", "SEMI"],
+    "altLangs": {"jp": "; (セミコロン)"},
     "symbol": ";",
     "description": "; [Semicolon] and : [Colon]",
     "context": "Keyboard",
@@ -1051,6 +1057,7 @@
   },
   {
     "names": ["SINGLE_QUOTE", "SQT", "APOSTROPHE", "APOS"],
+    "altLangs": {"jp": ": (コロン)"},
     "symbol": "'",
     "description": "' [Apostrophe] and \" [Quote (Double)]",
     "context": "Keyboard",
@@ -1085,6 +1092,7 @@
   },
   {
     "names": ["GRAVE"],
+    "altLangs": {"jp": "半角/全角"},
     "description": "` [Grave Accent] and ~ [Tilde]",
     "context": "Keyboard",
     "clarify": false,
@@ -1117,6 +1125,7 @@
   },
   {
     "names": ["COMMA"],
+    "altLangs": {"jp": ", (コンマ)"},
     "symbol": ",",
     "description": ", [Comma] and < [Less Than]",
     "context": "Keyboard",
@@ -1150,6 +1159,7 @@
   },
   {
     "names": ["PERIOD", "DOT"],
+    "altLangs": {"jp": ". (ピリオド)"},
     "symbol": ".",
     "description": ". [Period] and > [Greater Than]",
     "context": "Keyboard",
@@ -1670,6 +1680,7 @@
   },
   {
     "names": ["KP_DIVIDE", "KP_SLASH"],
+    "altLangs": {"jp": "/ (スラッシュ)"},
     "description": "/ [Divide]",
     "context": "Keypad",
     "clarify": false,
@@ -2509,6 +2520,7 @@
   },
   {
     "names": ["INTERNATIONAL_1", "INT1", "INT_RO"],
+    "altLangs": {"jp": "\\ (バックスラッシュ)"},
     "description": "ろ (International 1)",
     "context": "Keyboard",
     "clarify": false,
@@ -2525,6 +2537,7 @@
   },
   {
     "names": ["INTERNATIONAL_2", "INT2", "INT_KATAKANAHIRAGANA", "INT_KANA"],
+    "altLangs": {"jp": "カタカナ/ひらがな"},
     "description": "かな (International 2)",
     "context": "Keyboard",
     "clarify": false,
@@ -2541,6 +2554,7 @@
   },
   {
     "names": ["INTERNATIONAL_3", "INT3", "INT_YEN"],
+    "altLangs": {"jp": "¥ (円記号)"},
     "description": "¥ (International 3)",
     "context": "Keyboard",
     "clarify": false,
@@ -2557,6 +2571,7 @@
   },
   {
     "names": ["INTERNATIONAL_4", "INT4", "INT_HENKAN"],
+    "altLangs": {"jp": "変換"},
     "description": "変換 (International 4)",
     "context": "Keyboard",
     "clarify": false,
@@ -2573,6 +2588,7 @@
   },
   {
     "names": ["INTERNATIONAL_5", "INT5", "INT_MUHENKAN"],
+    "altLangs": {"jp": "無変換"},
     "description": "無変換 (International 5)",
     "context": "Keyboard",
     "clarify": false,
@@ -2653,6 +2669,7 @@
   },
   {
     "names": ["LANGUAGE_1", "LANG1", "LANG_HANGEUL"],
+    "altLangs": {"jp": "かな"},
     "description": "한/영 (Language 1)",
     "context": "Keyboard",
     "clarify": false,
@@ -2669,6 +2686,7 @@
   },
   {
     "names": ["LANGUAGE_2", "LANG2", "LANG_HANJA"],
+    "altLangs": {"jp": "英数"},
     "description": "한자 (Language 2)",
     "context": "Keyboard",
     "clarify": false,
