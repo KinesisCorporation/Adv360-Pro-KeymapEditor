@@ -2,7 +2,7 @@
   <span
     class="code"
     :title="source && `(${source.code}) ${source.description}`"
-    @click.stop="onSelect({ target: $event.target, codeIndex: index, code: value, altLangs: source.altLangs, param })"
+    @click.stop="onSelect({ target: $event.target, codeIndex: index, code: value, altLangs: source && source.altLangs, param })"
   >
     <template v-if="source">
       <span v-if="source.faIcon" class="['fa', `fa-${source.faIcon}" />
