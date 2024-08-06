@@ -59,6 +59,8 @@ function normalizeZmkKeycodes (keycodes) {
     if (fnCode) {
       keycodes.push(Object.assign({}, base, {
         code: fnCode[1],
+        langCode: "en",
+        altLang: "",     
         params: fnCode[2].split(',')
       }))
     }
