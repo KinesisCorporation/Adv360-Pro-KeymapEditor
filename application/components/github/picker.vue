@@ -249,7 +249,9 @@ export default {
   },
   computed: {
     repositoryChoices() {
-      return this.getRepositories().map(repo => ({
+      return this.getRepositories()
+      .filter(repo => !repo.full_name.toLowerCase().includes("adv360-pro-keymapeditor"))
+      .map(repo => ({
         id: repo.id,
         name: repo.full_name
       }))
